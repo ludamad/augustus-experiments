@@ -384,7 +384,7 @@ static int place_reservoir_and_aqueducts(int measure_only, int x_start, int y_st
     if (distance > 0) {
         if (map_building_is_reservoir(x_start - 1, y_start - 1)) {
             info->place_reservoir_at_start = PLACE_RESERVOIR_EXISTS;
-        } else if (map_tiles_are_clear(x_start - 1, y_start - 1, 3, TERRAIN_ALL)) {
+        } else if (map_tiles_are_clear(x_start - 1, y_start - 1, 3, TERRAIN_ALL_EXCEPT_RUBBLE)) {
             info->place_reservoir_at_start = PLACE_RESERVOIR_YES;
         } else {
             info->place_reservoir_at_start = PLACE_RESERVOIR_BLOCKED;
@@ -392,7 +392,7 @@ static int place_reservoir_and_aqueducts(int measure_only, int x_start, int y_st
     }
     if (map_building_is_reservoir(x_end - 1, y_end - 1)) {
         info->place_reservoir_at_end = PLACE_RESERVOIR_EXISTS;
-    } else if (map_tiles_are_clear(x_end - 1, y_end - 1, 3, TERRAIN_ALL)) {
+    } else if (map_tiles_are_clear(x_end - 1, y_end - 1, 3, TERRAIN_ALL_EXCEPT_RUBBLE)) {
         info->place_reservoir_at_end = PLACE_RESERVOIR_YES;
     } else {
         info->place_reservoir_at_end = PLACE_RESERVOIR_BLOCKED;
@@ -416,11 +416,11 @@ static int place_reservoir_and_aqueducts(int measure_only, int x_start, int y_st
     }
     if (info->place_reservoir_at_start != PLACE_RESERVOIR_NO) {
         map_routing_block(x_start - 1, y_start - 1, 3);
-        mark_construction(x_start - 1, y_start - 1, 3, TERRAIN_ALL, 1);
+        mark_construction(x_start - 1, y_start - 1, 3, TERRAIN_ALL_EXCEPT_RUBBLE, 1);
     }
     if (info->place_reservoir_at_end != PLACE_RESERVOIR_NO) {
         map_routing_block(x_end - 1, y_end - 1, 3);
-        mark_construction(x_end - 1, y_end - 1, 3, TERRAIN_ALL, 1);
+        mark_construction(x_end - 1, y_end - 1, 3, TERRAIN_ALL_EXCEPT_RUBBLE, 1);
     }
     const int aqueduct_offsets_x[] = { 0, 2, 0, -2 };
     const int aqueduct_offsets_y[] = { -2, 0, 2, 0 };
@@ -807,17 +807,17 @@ void building_construction_update(int x, int y, int grid_offset)
     } else if (type == BUILDING_TRIUMPHAL_ARCH) {
         mark_construction(x, y, 3, ~TERRAIN_ROAD, 0);
     } else if (type == BUILDING_WAREHOUSE) {
-        mark_construction(x, y, 3, TERRAIN_ALL, 0);
+        mark_construction(x, y, 3, TERRAIN_ALL_EXCEPT_RUBBLE, 0);
     } else if (building_is_fort(type)) {
         if (formation_get_num_legions_cached() < formation_get_max_legions()) {
             int rotation = building_rotation_get_rotation();
             int orientation = city_view_orientation() / 2;
             int x_offset = FORT_X_OFFSET[rotation][orientation];
             int y_offset = FORT_Y_OFFSET[rotation][orientation];
-            if (map_building_tiles_are_clear(x, y, 3, TERRAIN_ALL) &&
-                map_building_tiles_are_clear(x + x_offset, y + y_offset, 4, TERRAIN_ALL) &&
+            if (map_building_tiles_are_clear(x, y, 3, TERRAIN_ALL_EXCEPT_RUBBLE) &&
+                map_building_tiles_are_clear(x + x_offset, y + y_offset, 4, TERRAIN_ALL_EXCEPT_RUBBLE) &&
                 city_buildings_has_mess_hall()) {
-                mark_construction(x, y, 3, TERRAIN_ALL, 0);
+                mark_construction(x, y, 3, TERRAIN_ALL_EXCEPT_RUBBLE, 0);
             }
         }
     } else if (type == BUILDING_HIPPODROME) {
@@ -825,11 +825,11 @@ void building_construction_update(int x, int y, int grid_offset)
         building_rotation_get_offset_with_rotation(5, building_rotation_get_rotation(), &x_offset_1, &y_offset_1);
         int x_offset_2, y_offset_2;
         building_rotation_get_offset_with_rotation(10, building_rotation_get_rotation(), &x_offset_2, &y_offset_2);
-        if (map_building_tiles_are_clear(x, y, 5, TERRAIN_ALL) &&
-            map_building_tiles_are_clear(x + x_offset_1, y + y_offset_1, 5, TERRAIN_ALL) &&
-            map_building_tiles_are_clear(x + x_offset_2, y + y_offset_2, 5, TERRAIN_ALL) &&
+        if (map_building_tiles_are_clear(x, y, 5, TERRAIN_ALL_EXCEPT_RUBBLE) &&
+            map_building_tiles_are_clear(x + x_offset_1, y + y_offset_1, 5, TERRAIN_ALL_EXCEPT_RUBBLE) &&
+            map_building_tiles_are_clear(x + x_offset_2, y + y_offset_2, 5, TERRAIN_ALL_EXCEPT_RUBBLE) &&
             !city_buildings_has_hippodrome()) {
-            mark_construction(x, y, 5, TERRAIN_ALL, 0);
+            mark_construction(x, y, 5, TERRAIN_ALL_EXCEPT_RUBBLE, 0);
         }
     } else if (type == BUILDING_SHIPYARD || type == BUILDING_WHARF || type == BUILDING_DOCK) {
         if (!map_water_determine_orientation(x, y, building_properties_for_type(type)->size, 1, 0, 0, 1, 0)) {
@@ -847,7 +847,7 @@ void building_construction_update(int x, int y, int grid_offset)
             !(building_monument_is_grand_temple(type) &&
             building_monument_count_grand_temples() >= config_get(CONFIG_GP_CH_MAX_GRAND_TEMPLES))) {
             int size = building_properties_for_type(type)->size;
-            mark_construction(x, y, size, TERRAIN_ALL, 0);
+            mark_construction(x, y, size, TERRAIN_ALL_EXCEPT_RUBBLE, 0);
         }
     }
     data.cost_preview = current_cost;

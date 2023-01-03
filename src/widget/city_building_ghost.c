@@ -524,7 +524,7 @@ static void draw_draggable_reservoir(const map_tile *tile, int x, int y)
     } else {
         if (map_building_is_reservoir(map_x, map_y)) {
             blocked = 0;
-        } else if (!map_tiles_are_clear(map_x, map_y, 3, TERRAIN_ALL)) {
+        } else if (!map_tiles_are_clear(map_x, map_y, 3, TERRAIN_ALL_EXCEPT_RUBBLE)) {
             blocked = 1;
         }
     }
